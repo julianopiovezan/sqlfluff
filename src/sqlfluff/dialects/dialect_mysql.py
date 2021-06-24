@@ -19,6 +19,7 @@ from sqlfluff.core.parser import (
     SymbolSegment,
     Delimited,
     RegexParser,
+    Delimited,
 )
 from sqlfluff.core.dialects import load_raw_dialect
 
@@ -76,6 +77,11 @@ mysql_dialect.add(
         name="atsign_literal",
         type="literal",
         trim_chars=("@",),
+    ),
+    CTeClauseTerminatorGrammar=OneOf(
+        "SELECT",
+        "UPDATE",
+        "DELETE",
     ),
 )
 
@@ -502,5 +508,25 @@ class CallStoredProcedureSegment(BaseSegment):
                     Ref("FunctionSegment"),
                 ),
             ),
+        ),
+    )
+
+@mysql_dialect.segment(replace=True)
+class WithCompoundStatementSegment(ansi_dialect.get_segment("WithCompoundStatementSegment")):
+    """A `SELECT`, `UPDATE`, `DELETE` statement preceded by a selection of `WITH` clauses.
+
+    `WITH tab (col1,col2) AS (SELECT a,b FROM x)`
+    """
+
+    parse_grammar = Sequence(
+        "WITH",
+        Delimited(
+            Ref("CTEDefinitionSegment"),
+            terminator=Ref("CTeClauseTerminatorGrammar"),
+        ),
+        OneOf(
+            Ref("NonWithSelectableGrammar"),
+            Ref("UpdateStatementSegment"),
+            Ref("DeleteStatementSegment"),
         ),
     )
