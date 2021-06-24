@@ -595,3 +595,21 @@ class TruncateStatementSegment(BaseSegment):
         Ref.keyword("TABLE", optional=True),
         Ref("TableReferenceSegment"),
     )
+
+
+@mysql_dialect.segment(replace=True)
+class IntervalExpressionSegment(ansi_dialect.get_segment("IntervalExpressionSegment")):
+    """An interval expression segment."""
+
+    match_grammar = Sequence(
+        "INTERVAL",
+        OneOf(
+            # The Numeric/expression Version
+            Sequence(
+                OneOf(Ref("NumericLiteralSegment"), Ref("ExpressionSegment")),
+                OneOf(Ref("QuotedLiteralSegment"), Ref("DatetimeUnitSegment")),
+            ),
+            # The String version
+            Ref("QuotedLiteralSegment"),
+        ),
+    )
