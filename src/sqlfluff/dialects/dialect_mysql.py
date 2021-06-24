@@ -33,8 +33,30 @@ mysql_dialect.patch_lexer_matchers(
             r"(-- |#)[^\n]*",
             CommentSegment,
             segment_kwargs={"trim_start": ("-- ", "#")},
-        )
+        ),
     ]
+)
+
+mysql_dialect.insert_lexer_matchers(
+    [
+        RegexLexer(
+            "atsign",
+            r"[@][a-zA-Z0-9_]*",
+            CodeSegment,
+        ),
+    ],
+    before="code",
+)
+
+mysql_dialect.insert_lexer_matchers(
+    [
+        RegexLexer(
+            "json_operator",
+            r"->>?",
+            CodeSegment,
+        ),
+    ],
+    before="not_equal",
 )
 
 # Reserve USE, FORCE & IGNORE
@@ -61,6 +83,11 @@ mysql_dialect.replace(
         Sequence("FOR", OneOf("JOIN"), optional=True),
         Bracketed(Ref("ObjectReferenceSegment")),
     ),
+    BinaryOperatorGrammar=ansi_dialect.get_grammar("BinaryOperatorGrammar").copy(
+        insert=[
+            Ref("JsonOperatorSegment"),
+        ]
+    ),
 )
 
 mysql_dialect.add(
@@ -82,6 +109,9 @@ mysql_dialect.add(
         "SELECT",
         "UPDATE",
         "DELETE",
+    ),
+    JsonOperatorSegment=NamedParser(
+        "json_operator", SymbolSegment, name="json_operator", type="binary_operator"
     ),
 )
 
@@ -165,17 +195,6 @@ mysql_dialect.replace(
     ParameterNameSegment=RegexParser(
         r"`?[A-Za-z0-9_]*`?", CodeSegment, name="parameter", type="parameter"
     ),
-)
-
-mysql_dialect.insert_lexer_matchers(
-    [
-        RegexLexer(
-            "atsign",
-            r"[@][a-zA-Z0-9_]*",
-            CodeSegment,
-        ),
-    ],
-    before="code",
 )
 
 
