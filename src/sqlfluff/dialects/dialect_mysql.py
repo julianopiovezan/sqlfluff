@@ -530,3 +530,19 @@ class WithCompoundStatementSegment(ansi_dialect.get_segment("WithCompoundStateme
             Ref("DeleteStatementSegment"),
         ),
     )
+
+@mysql_dialect.segment(replace=True)
+class UpdateStatementSegment(ansi_dialect.get_segment("UpdateStatementSegment")):
+    """A `Update` statement.
+
+    UPDATE <table name> [JOIN ...] SET <set clause list> [ WHERE <search condition> ]
+    """
+
+    parse_grammar = Sequence(
+        "UPDATE",
+        OneOf(Ref("TableReferenceSegment"), Ref("AliasedTableReferenceGrammar")),
+        Ref("JoinClauseSegment", optional=True),
+        Ref("SetClauseListSegment"),
+        Ref("FromClauseSegment", optional=True),
+        Ref("WhereClauseSegment", optional=True),
+    )
