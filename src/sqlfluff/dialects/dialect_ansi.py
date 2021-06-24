@@ -2597,10 +2597,7 @@ class SetClauseSegment(BaseSegment):
         Ref("ColumnReferenceSegment"),
         Ref("EqualsSegment"),
         OneOf(
-            Ref("LiteralGrammar"),
-            Ref("BareFunctionSegment"),
-            Ref("FunctionSegment"),
-            Ref("ColumnReferenceSegment"),
+            Ref("BaseExpressionElementGrammar"),
             "DEFAULT",
         ),
     )
