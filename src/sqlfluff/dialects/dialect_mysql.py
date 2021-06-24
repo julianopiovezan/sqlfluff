@@ -20,6 +20,7 @@ from sqlfluff.core.parser import (
     Delimited,
     RegexParser,
     Delimited,
+    StartsWith,
 )
 from sqlfluff.core.dialects import load_raw_dialect
 
@@ -276,6 +277,7 @@ class StatementSegment(ansi_dialect.get_segment("StatementSegment")):  # type: i
             Ref("SetAssignmentStatementSegment"),
             Ref("IfExpressionStatement"),
             Ref("CallStoredProcedureSegment"),
+            Ref("TruncateStatementSegment"),
         ],
     )
 
@@ -564,4 +566,26 @@ class UpdateStatementSegment(ansi_dialect.get_segment("UpdateStatementSegment"))
         Ref("SetClauseListSegment"),
         Ref("FromClauseSegment", optional=True),
         Ref("WhereClauseSegment", optional=True),
+    )
+
+
+@mysql_dialect.segment()
+class TruncateStatementSegment(BaseSegment):
+    """`TRUNCATE TABLE` statement.
+
+    https://dev.mysql.com/doc/refman/8.0/en/truncate-table.html
+    """
+
+    type = "truncate_table"
+
+    is_ddl = False
+    is_dml = True
+    is_dql = False
+    is_dcl = False
+
+    match_grammar = StartsWith("TRUNCATE")
+    parse_grammar = Sequence(
+        "TRUNCATE",
+        Ref.keyword("TABLE", optional=True),
+        Ref("TableReferenceSegment"),
     )
