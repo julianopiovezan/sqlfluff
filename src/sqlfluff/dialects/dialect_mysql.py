@@ -89,6 +89,12 @@ mysql_dialect.replace(
             Ref("JsonOperatorSegment"),
         ]
     ),
+    FunctionContentsGrammar=ansi_dialect.get_grammar("FunctionContentsGrammar").copy(
+        insert=[
+            # A Convert-like function
+            Sequence(Ref("ExpressionSegment"), "USING", Ref("NakedIdentifierSegment")),
+        ]
+    )
 )
 
 mysql_dialect.add(
