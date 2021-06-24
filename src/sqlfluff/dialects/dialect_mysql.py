@@ -51,6 +51,7 @@ mysql_dialect.replace(
     LiteralGrammar=ansi_dialect.get_grammar("LiteralGrammar").copy(
         insert=[
             Ref("DoubleQuotedLiteralSegment"),
+            Ref("AtSignLiteralSegment"),
         ]
     ),
     PostTableExpressionGrammar=Sequence(
