@@ -406,6 +406,7 @@ ansi_dialect.add(
     IfExistsGrammar=Sequence("IF", "EXISTS"),
     IfNotExistsGrammar=Sequence("IF", "NOT", "EXISTS"),
     LikeGrammar=OneOf("LIKE", "RLIKE", "ILIKE"),
+    RegexpGrammar=Ref.keyword("REGEXP"),
     IsClauseGrammar=OneOf(
         "NULL",
         "NAN",
@@ -1367,6 +1368,10 @@ ansi_dialect.add(
                         Sequence(
                             Ref("BinaryOperatorGrammar"),
                             Ref.keyword("NOT", optional=True),
+                        ),
+                        Sequence(
+                            Ref.keyword("NOT", optional=True),
+                            Ref("RegexpGrammar"),
                         ),
                         # We need to add a lot more here...
                     ),
